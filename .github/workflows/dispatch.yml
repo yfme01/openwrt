@@ -5,11 +5,6 @@ on:
     - cron: '20 23 * * *'
   
   workflow_dispatch:
-    inputs:
-      package_clean:
-        description: 'check to make clean package'
-        default: 'false'
-        required: true
 
 jobs:
   build:
