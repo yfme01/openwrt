@@ -1,4 +1,7 @@
-# Nanopi R1S R2S R2C R4S Openwrt 固件
+# Nanopi R2S R4S x86 Openwrt 固件
+
+仅保留个人常用的插件
+adguardhome、openclash、frpc、upnp、openvpn、zerotier等
 
 [刷机工具](https://www.balena.io/etcher/)  
 [下载地址](#下载地址)  
@@ -9,7 +12,7 @@
 [1分钟生成自己所需固件](#1分钟生成自己所需固件)  
 
 ### 下载地址：
-https://github.com/klever1988/nanopi-openwrt/tags  
+https://github.com/yfme01/nanopi-openwrt/tags  
 (img.gz档不需要解压，可以直接使用刷机工具刷入)
 
 ### 使用提示：
@@ -19,11 +22,11 @@ https://github.com/klever1988/nanopi-openwrt/tags
 
 ### 终端内在线升级方法：
 ```bash
-wget -qO- https://github.com/klever1988/nanopi-openwrt/raw/master/scripts/autoupdate-bash.sh | bash
+wget -qO- https://github.com/yfme01/nanopi-openwrt/raw/master/scripts/autoupdate-bash.sh | bash
 ```
 slim版
 ```bash
-wget -qO- https://github.com/klever1988/nanopi-openwrt/raw/master/scripts/autoupdate-bash.sh | ver=-slim bash
+wget -qO- https://github.com/yfme01/nanopi-openwrt/raw/master/scripts/autoupdate-bash.sh | ver=-slim bash
 ```
 (脚本由gary lau提供，非常感谢！)
 
@@ -43,9 +46,6 @@ wget -qO- https://github.com/klever1988/nanopi-openwrt/raw/master/scripts/autoup
 
 ### 更新说明：
 https://github.com/klever1988/nanopi-openwrt/blob/master/CHANGELOG.md
-
-#### 本固件NAT基准性能测试：
-<img src="https://raw.githubusercontent.com/klever1988/nanopi-openwrt/master/assets/NAT.jpg" width="450" />
 
 #### 固件源码：
 https://github.com/immortalwrt/immortalwrt
