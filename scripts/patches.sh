@@ -118,7 +118,7 @@ fi
 
 # set default theme to openwrt2020
 # sed -i '/uci commit luci/i\uci set luci.main.mediaurlbase="/luci-static/argon"' `find package -type f -path '*/default-settings/files/99-default-settings'`
-sed -i '/uci commit luci/i\uci set luci.main.mediaurlbase="/luci-static/argon"'
+sed -i '/uci commit luci/i\uci set luci.main.mediaurlbase="/luci-static/argonv3"'
 
 # remove the mirros from cn
 sed -i '/182.140.223.146/d;/\.cn\//d;/tencent/d' scripts/download.pl
