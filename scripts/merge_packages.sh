@@ -39,10 +39,10 @@ merge_package https://github.com/coolsnowwolf/lede/trunk/package/lean/ntfs3-oot
 merge_package https://github.com/kuoruan/openwrt-frp frp
 merge_package https://github.com/kuoruan/luci-app-frpc
 merge_package https://github.com/small-5/luci-app-adblock-plus
+merge_package https://github.com/rufengsuixing/luci-app-adguardhome
 merge_package https://github.com/zxlhhyccc/luci-app-v2raya
 merge_package https://github.com/messense/aliyundrive-webdav/trunk/openwrt/aliyundrive-webdav
 merge_package https://github.com/messense/aliyundrive-webdav/trunk/openwrt/luci-app-aliyundrive-webdav
-merge_package https://github.com/jerrykuku/luci-app-jd-dailybonus
 merge_package https://github.com/nickilchen/luci-app-socat
 drop_package luci-app-cd8021x
 drop_package luci-app-cifs
