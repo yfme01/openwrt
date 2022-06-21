@@ -26,10 +26,15 @@ mv $GITHUB_WORKSPACE/patches/99-disallow-aaaa.patch `find package/ -follow -type
 
 sed -i 's/5.0/1.0/' .ccache/ccache.conf || true
 
-line_number_INCLUDE_V2ray=$[`grep -m1 -n 'Include V2ray' package/custom/openwrt-passwall/luci-app-passwall/Makefile`-1]
+line_number_INCLUDE_Xray=$[`grep -m1 -n 'Include Xray' package/custom/openwrt-passwall/luci-app-passwall/Makefile|cut -d: -f1`-1]
+sed -i $line_number_INCLUDE_Xray'd' package/custom/openwrt-passwall/luci-app-passwall/Makefile
+sed -i $line_number_INCLUDE_Xray'd' package/custom/openwrt-passwall/luci-app-passwall/Makefile
+sed -i $line_number_INCLUDE_Xray'd' package/custom/openwrt-passwall/luci-app-passwall/Makefile
+line_number_INCLUDE_V2ray=$[`grep -m1 -n 'Include V2ray' package/custom/openwrt-passwall/luci-app-passwall/Makefile|cut -d: -f1`-1]
 sed -i $line_number_INCLUDE_V2ray'd' package/custom/openwrt-passwall/luci-app-passwall/Makefile
 sed -i $line_number_INCLUDE_V2ray'd' package/custom/openwrt-passwall/luci-app-passwall/Makefile
 sed -i $line_number_INCLUDE_V2ray'd' package/custom/openwrt-passwall/luci-app-passwall/Makefile
+
 
 if [ $BRANCH == 'master' ]; then
 
@@ -56,10 +61,7 @@ if [ $BRANCH == 'master' ]; then
   echo -e "\toption minfreq0 '816000'" >> $config_file_cpufreq
   echo -e "\toption maxfreq0 '1512000'\n" >> $config_file_cpufreq
 
-  # enable fan control
-  wget https://github.com/friendlyarm/friendlywrt/commit/cebdc1f94dcd6363da3a5d7e1e69fd741b8b718e.patch
-  git apply cebdc1f94dcd6363da3a5d7e1e69fd741b8b718e.patch
-  rm cebdc1f94dcd6363da3a5d7e1e69fd741b8b718e.patch
+  # fix fan control
   sed -i 's/pwmchip1/pwmchip0/' target/linux/rockchip/armv8/base-files/usr/bin/fa-fancontrol.sh target/linux/rockchip/armv8/base-files/usr/bin/fa-fancontrol-direct.sh
 
 fi
@@ -103,7 +105,7 @@ if [[ $DEVICE == 'r4s' || $DEVICE == 'r2s' || $DEVICE == 'r2c' || $DEVICE == 'r1
   sed -i 's/5.10/5.4/g' target/linux/rockchip/Makefile
   line_number_CONFIG_CRYPTO_LIB_BLAKE2S=$[`grep -n 'CONFIG_CRYPTO_LIB_BLAKE2S' package/kernel/linux/modules/crypto.mk | cut -d: -f 1`+1]
   sed -i $line_number_CONFIG_CRYPTO_LIB_BLAKE2S' s/HIDDEN:=1/DEPENDS:=@(LINUX_5_4||LINUX_5_10)/' package/kernel/linux/modules/crypto.mk
-  echo 'kmod-wireguard' >> `ls staging_dir/target-*/pkginfo/linux.default.install`
+  sed -i 's/libblake2s.ko@lt5.9/libblake2s.ko/;s/libblake2s-generic.ko@lt5.9/libblake2s-generic.ko/' package/kernel/linux/modules/crypto.mk
 fi
 
 # ...
