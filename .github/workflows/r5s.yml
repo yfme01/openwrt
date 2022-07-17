@@ -37,22 +37,24 @@ jobs:
           docker images -q | xargs -ri docker rmi {}
           git clone https://github.com/friendlyarm/repo
           sudo cp repo/repo /usr/bin/
+
       - name: checkout out cache
         run: |
           cd
           curl -sL https://raw.githubusercontent.com/klever1988/nanopi-openwrt/zstd-bin/zstd | sudo tee /usr/bin/zstd > /dev/null
-          sudo umount lede || true
-          sudo fdisk -l | grep loop | grep '30 GiB' | awk '{print $2}' | tr -d ':' | xargs -r -n1 sudo losetup -d
+          sudo umount lede friendlywrt-rk3568 || true
+          sudo fdisk -l | grep loop | grep '45 GiB' | awk '{print $2}' | tr -d ':' | xargs -r -n1 sudo losetup -d
           rm -r lede* luci packages || true
           for i in {1..20}
           do
             curl -sL --fail https://github.com/klever1988/sshactions/releases/download/cache/lede.$DEVICE.img.zst.0$i || break
-          done | zstdmt -d -o lede.img || (truncate -s 55g lede.img && mkfs.btrfs -M lede.img)
+          done | zstdmt -d -o lede.img || (truncate -s 45g lede.img && mkfs.btrfs -M lede.img)
           LOOP_DEVICE=$(losetup -f) && echo "LOOP_DEVICE=$LOOP_DEVICE" >> $GITHUB_ENV
           sudo losetup -P --direct-io $LOOP_DEVICE lede.img
           cd -
           mkdir lede && sudo mount -o nossd,compress=zstd $LOOP_DEVICE lede
           sudo chown -R $USER:$(id -gn) lede
+
       - name: init sources
         run: |
           mkdir friendlywrt-rk3568 && sudo mount --bind lede friendlywrt-rk3568
@@ -76,12 +78,14 @@ jobs:
           git add . && git commit -m prepare
           git checkout `git branch -va | grep remotes/m | awk '{print $3}' | awk -F\/ '{print $2}'`
           git rebase efcced5190bfd69ff438073853494f711a384052^ --onto tmp
+
       - name: fix
         run: |
           cd friendlywrt-rk3568/friendlywrt
           git revert `git log package/network/utils/umbim | head -1 | awk '{print $2}'` --no-edit
           git revert `git log tools/automake | head -1 | awk '{print $2}'` --no-edit
           git rm -r package/utils/usbmode
+
       - name: mods
         run: |
           cd friendlywrt-rk3568
@@ -105,20 +109,21 @@ jobs:
           ./scripts/feeds install -a
           . $GITHUB_WORKSPACE/scripts/merge_packages.sh
           . $GITHUB_WORKSPACE/scripts/patches.sh
+
       - name: compile
         run: |
           cd friendlywrt-rk3568
           ./build.sh nanopi_r5s.mk || (cd friendlywrt && make V=sc && exit 255)
           cd friendlywrt
           make target/imagebuilder/compile
+
       - name: Save cache state
         run: |
           sleep 60
           sudo mount -o remount,compress=no,nodatacow,nodatasum lede
           cd lede/; pv /dev/zero > zerospace || true; sync; rm -f zerospace; cd -
           sleep 60
-          sudo umount friendlywrt-rk3568
-          sudo umount lede
+          sudo umount friendlywrt-rk3568 lede
           sudo losetup -d $LOOP_DEVICE
           export AUTH="Authorization: token ${{ secrets.SEC_TOKEN }}"
           export cache_path='github.com/repos/klever1988/sshactions/releases'
@@ -135,7 +140,9 @@ jobs:
           for i in {1..20}; do curl -sL --fail https://github.com/klever1988/sshactions/releases/download/cache/lede.$DEVICE.img.zst.0$i || break; done | zstdmt -d -o /dev/null
           if [ $? -eq 0 ]; then break; fi
           done
+          rm *.img.zst
           sudo mount -o loop ~/lede.img friendlywrt-rk3568
+
       - name: prepare relase
         run: |
           sed -i 's/bin\/targets\/rockchip\/armv8\/packages/ib\/packages/' friendlywrt-rk3568/device/friendlyelec/rk3568/base.mk
@@ -146,12 +153,14 @@ jobs:
           cd ..
           ./build.sh sd-img
           cd ..
+
           mkdir -p $GITHUB_WORKSPACE/release
           mv $(ls -1 friendlywrt-rk3568/out/*img.gz | head -1) $GITHUB_WORKSPACE/release/$DEVICE.img.gz
           cd $GITHUB_WORKSPACE/release/ && md5sum $DEVICE.img.gz > $DEVICE.img.gz.md5
           gzip -dc $DEVICE.img.gz | md5sum | sed "s/-/$DEVICE.img/" > $DEVICE.img.md5
           echo "strDate=$(TZ=UTC-8 date +%Y-%m-%d)" >> $GITHUB_ENV
           echo "strDevice=$(echo $DEVICE | awk '{print toupper($0)}')" >> $GITHUB_ENV
+
       - name: create release
         uses: svenstaro/upload-release-action@v2
         with:
